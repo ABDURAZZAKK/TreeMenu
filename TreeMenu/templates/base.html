@@ -1,0 +1,133 @@
+{% load static %}
+{% load tree_menu_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}django-simple-menu example{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+
+    {% block extra_head %}{% endblock extra_head %}
+</head>
+
+<body>
+
+    О нас:{% draw_menu name='main' %}
+    <hr>
+    О вас:{% draw_menu name='_root_' %}
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+<style>
+    /* Удалить пули по умолчанию */
+    ul,
+    #myUL {
+        list-style-type: none;
+    }
+
+    /* Удалите поля и отступы из родительского ul */
+    #myUL {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Стиль курсора/стрелки */
+    .caret {
+        cursor: pointer;
+        user-select: none;
+        /* Запретить выделение текста */
+    }
+
+    /* Создайте курсор/стрелку с юникодом, и стиль его */
+    .caret::before {
+        content: "\25B6";
+        color: black;
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+    /* Поверните значок курсора/стрелки при нажатии (с помощью JavaScript) */
+    .down::before {
+        transform: rotate(90deg);
+    }
+
+    /* Скрыть вложенный список */
+    .nested {
+        display: none;
+    }
+
+    /* Показать вложенный список, когда пользователь нажимает на курсор стрелку (с JavaScript) */
+    .active {
+        display: block;
+    }
+</style>
+<script>
+
+    function setAttr(prmName, val) {
+        const url = new URL(window.location);
+        url.searchParams.set(prmName, val);
+        history.pushState(null, null, url);
+    }
+
+    var toggler = document.getElementsByClassName("caret");
+
+
+    for (let i of toggler) {
+        i.addEventListener("click", function () {
+            this.parentElement.querySelector(".nested").classList.toggle("active");
+            this.classList.toggle("down");
+            let value = this.parentElement.previousElementSibling
+            if (value !== null) {
+
+                let cls = value.className.split(" ")
+                cls = cls[cls.length - 1]
+                value = value.textContent
+                setAttr(`active_menu_${cls}`, value)
+            }
+        });
+    }
+
+    function dropdawn(elem) {
+        let v = elem.parentElement.previousElementSibling
+        if (v !== null) {
+            if (v.className.includes("menu_name"))
+                dropdawn(v)
+            else if (v.className == "caret") {
+                v.parentElement.querySelector(".nested").classList.toggle("active");
+                v.classList.toggle("down");
+                dropdawn(v)
+            }
+        }
+    }
+
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    for (let k of urlParams.keys()) {
+        if (k.includes("active_menu")) {
+            var names = document.getElementsByClassName("menu_name");
+            for (let i of names) {
+                let cls = i.className.split(" ")
+                cls = cls[cls.length - 1]
+                if (k.includes(cls) && i.textContent == urlParams.get(k)) {
+                    dropdawn(i)
+                    break
+                }
+            }
+        }
+    }
+
+
+
+</script>
+
+</html>

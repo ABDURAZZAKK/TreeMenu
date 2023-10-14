@@ -1,0 +1,11 @@
+<li><span class="caret"></span>
+    <ul class="nested">
+        {% for m in menu_items %}
+
+        <li class="menu_name {{menu_name}}"><a href={{m.url}}>{{m}}</a></li>
+
+        {% include 'tags\TreeMenu.html' with menu_items=m.get_children %}
+
+        {% endfor%}
+    </ul>
+</li>
